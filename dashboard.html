@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>銷售數據儀表板｜Dashboard_Data.xlsx</title>
+<style>
+:root{
+  --bg:#F5F7FA; --card:#FFFFFF; --ink:#0F172A; --muted:#5A6472; --faint:#8A93A2;
+  --line:#E2E7EE; --line2:#EEF1F5;
+  --accent:#0F766E; --accent2:#0369A1; --accent-soft:#E6F4F1;
+  --warn:#B45309; --warn-soft:#FEF3E2; --danger:#B91C1C; --danger-soft:#FDECEC;
+  --shadow:0 1px 2px rgba(15,23,42,.05),0 8px 24px -16px rgba(15,23,42,.25);
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0B1220; --card:#121A29; --ink:#E8EDF5; --muted:#9AA6B8; --faint:#6F7C90;
+    --line:#223047; --line2:#1A2537;
+    --accent:#4FD1C5; --accent2:#7DD3FC; --accent-soft:#0F2E2C;
+    --warn:#FBBF24; --warn-soft:#2E2410; --danger:#F87171; --danger-soft:#301818;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -18px rgba(0,0,0,.8);
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  line-height:1.55;font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;
+}
+.skip{position:absolute;left:-999px;top:0;background:var(--accent);color:#fff;padding:10px 14px;border-radius:0 0 8px 0;z-index:50}
+.skip:focus{left:0}
+.wrap{max-width:1240px;margin:0 auto;padding:28px 20px 64px}
+header.top{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between;margin-bottom:22px}
+h1{font-size:clamp(24px,3.4vw,34px);line-height:1.15;margin:0 0 6px;letter-spacing:-.02em}
+.sub{margin:2px 0;color:var(--muted);font-size:13.5px}
+.sub strong{color:var(--ink);font-weight:650}
+.badge{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:12.5px;color:var(--muted);box-shadow:var(--shadow)}
+.badge b{color:var(--ink);font-weight:650}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+section{margin-bottom:22px}
+h2{font-size:17px;margin:0 0 4px;letter-spacing:-.01em}
+.hint{color:var(--muted);font-size:12.5px;margin:0 0 14px}
+.summary{padding:20px 22px}
+.summary p{margin:0;font-size:14.5px;color:var(--ink);max-width:92ch}
+.summary .note{margin-top:10px;color:var(--muted);font-size:12.5px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 15px;box-shadow:var(--shadow)}
+.kpi .k{font-size:12px;color:var(--muted);margin-bottom:6px}
+.kpi .v{font-size:clamp(19px,2.4vw,25px);font-weight:700;letter-spacing:-.02em}
+.kpi .s{font-size:11.5px;color:var(--faint);margin-top:4px}
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:end;padding:14px 16px;position:relative}
+.f{display:flex;flex-direction:column;gap:5px;min-width:150px;flex:0 1 auto}
+.f label{font-size:11.5px;color:var(--muted);font-weight:600}
+select,.search{font:inherit;font-size:13.5px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:9px;padding:9px 11px;min-height:40px}
+select:focus-visible,.search:focus-visible,.btn:focus-visible,th[data-key]:focus-visible,circle.pt:focus-visible,rect.bar:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
+.btn{font:inherit;font-size:13px;font-weight:650;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 14px;min-height:40px;cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.ghost{background:transparent}
+.grid2{display:grid;grid-template-columns:1.35fr 1fr;gap:16px}
+.grid2b{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:900px){.grid2,.grid2b{grid-template-columns:1fr}}
+.panel{padding:18px}
+.panel h3{font-size:14.5px;margin:0 0 2px}
+.panel .cap{color:var(--muted);font-size:12px;margin:0 0 10px}
+.chart{width:100%;height:auto;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:12px;color:var(--muted)}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:6px;vertical-align:-1px}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;line-height:1.45;padding:8px 10px;border-radius:8px;opacity:0;transform:translateY(4px);transition:opacity .12s ease,transform .12s ease;z-index:60;max-width:260px}
+.tip.show{opacity:1;transform:none}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line2);text-align:left;white-space:nowrap}
+th{font-size:11.5px;color:var(--muted);font-weight:650;text-transform:none;background:var(--card);position:sticky;top:0;z-index:2}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tbody tr:hover{background:var(--accent-soft)}
+tbody tr:last-child td{border-bottom:none}
+.tablewrap{max-height:520px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+.scroll-hint{font-size:11.5px;color:var(--faint);margin-top:6px}
+th[data-key]{cursor:pointer;user-select:none}
+th[data-key]:hover{color:var(--accent)}
+th .ar{font-size:10px;color:var(--faint);margin-left:4px}
+.risk{padding:18px}
+.risk ul,.ins ul{margin:8px 0 0;padding-left:20px}
+.risk li,.ins li{margin:7px 0;font-size:13.5px}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;margin-right:6px;vertical-align:1px}
+.pill.w{background:var(--warn-soft);color:var(--warn)}
+.pill.d{background:var(--danger-soft);color:var(--danger)}
+.pill.g{background:var(--accent-soft);color:var(--accent)}
+.ins{padding:18px}
+.ins h3{margin-top:0}
+.ins .rec{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.ins .rec h4{font-size:13.5px;margin:0 0 6px}
+.ins .rec ol{margin:0;padding-left:20px}
+.ins .rec li{margin:6px 0;font-size:13.5px}
+footer.notes{color:var(--muted);font-size:12px;line-height:1.7;border-top:1px solid var(--line);padding-top:14px;margin-top:26px}
+footer.notes b{color:var(--ink)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.empty{padding:22px;text-align:center;color:var(--muted);font-size:13.5px}
+@media (max-width:640px){
+  .wrap{padding:18px 12px 48px}
+  .kpis{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+  .filters{padding:12px}
+  .f{min-width:calc(50% - 6px)}
+  th,td{padding:8px}
+}
+@media print{
+  :root{--bg:#fff;--card:#fff;--shadow:none;--ink:#000;--muted:#333;--line:#bbb;--line2:#ddd}
+  body{background:#fff}
+  .filters,.btn,.tip,.skip,.search{display:none!important}
+  .tablewrap{max-height:none;overflow:visible;border:1px solid #bbb}
+  th{position:static}
+  .card,.kpi{break-inside:avoid;box-shadow:none;border:1px solid #bbb}
+  section{break-inside:avoid}
+  a{color:#000;text-decoration:none}
+  @page{margin:14mm}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳至主要內容</a>
+<div class="wrap">
+
+<header class="top">
+  <div>
+    <h1>銷售數據儀表板</h1>
+    <p class="sub">來源檔案：<strong>Dashboard_Data.xlsx</strong>（工作表：SalesData）</p>
+    <p class="sub">報告期：<strong>2018-01-11 至 2020-12-27</strong>　·　資料性質：逐筆發票明細</p>
+    <p class="sub">目的：依來源發票資料整理銷售表現、產品與市場結構，並如實標示資料限制。</p>
+  </div>
+  <div class="badge"><span class="dot" aria-hidden="true"></span><b id="badgeRows">99</b> 張發票　·　<b id="badgeProducts">6</b> 款產品　·　<b id="badgeDests">5</b> 個目的地</div>
+</header>
+
+<main id="main">
+
+<section class="card summary" aria-labelledby="sumTitle">
+  <h2 id="sumTitle">管理層摘要</h2>
+  <p>本儀表板整理 SalesData 工作表內 99 張發票。期內總收入 <strong>9,890,000.00</strong>、總成本 <strong>6,647,000.00</strong>、毛利 <strong>3,243,000.00</strong>，毛利率 <strong>32.79%</strong>。收入由 2018 年 <strong>4,010,000.00</strong> 逐年下降至 2020 年 <strong>2,460,000.00</strong>，累計減少 <strong>38.65%</strong>；同期發票數由 39 張減至 24 張。澳洲（AU）為最大目的地市場，佔收入 <strong>50.22%</strong>；PTS-14 為收入最高產品，佔 <strong>28.82%</strong>。</p>
+  <p class="note">註：來源檔未標示金額幣別，本儀表板只沿用原始數值，不假設任何貨幣單位。</p>
+</section>
+
+<section aria-labelledby="kpiTitle">
+  <h2 id="kpiTitle" class="sr">主要指標</h2>
+  <div class="kpis" id="kpis"></div>
+</section>
+
+<section class="card filters" aria-labelledby="filterTitle">
+  <h2 id="filterTitle" class="sr">篩選器</h2>
+  <div class="f"><label for="fYear">年份</label><select id="fYear"><option value="all">全部年份</option><option>2018</option><option>2019</option><option>2020</option></select></div>
+  <div class="f"><label for="fDest">目的地</label><select id="fDest"><option value="all">全部目的地</option><option>AU</option><option>HK</option><option>JP</option><option>UK</option><option>US</option></select></div>
+  <div class="f"><label for="fProd">產品</label><select id="fProd"><option value="all">全部產品</option><option>PTS-10</option><option>PTS-11</option><option>PTS-12</option><option>PTS-13</option><option>PTS-14</option><option>PTS-15</option></select></div>
+  <div class="f" style="min-width:170px"><label for="fSearch">搜尋明細</label><input class="search" id="fSearch" type="search" placeholder="發票號、產品、目的地或日期" autocomplete="off"></div>
+  <button class="btn ghost" id="resetBtn" type="button">重設篩選</button>
+  <span class="sr" id="filterStatus" role="status" aria-live="polite"></span>
+</section>
+
+<section class="grid2">
+  <div class="card panel">
+    <h3 id="c1t">月度收入趨勢</h3>
+    <p class="cap">依發票日期（Date1）按月彙總，單位為來源數值。</p>
+    <div id="c1" role="img" aria-labelledby="c1t c1d"><span id="c1d" class="sr"></span><div id="c1b"></div></div>
+  </div>
+  <div class="card panel">
+    <h3 id="c2t">目的地收入佔比</h3>
+    <p class="cap">依目的地（DEST）彙總，百分比以篩選後收入為分母。</p>
+    <div id="c2" role="img" aria-labelledby="c2t c2d"><span id="c2d" class="sr"></span><div id="c2b"></div></div>
+  </div>
+</section>
+
+<section class="grid2b">
+  <div class="card panel">
+    <h3 id="c3t">產品收入與毛利率</h3>
+    <p class="cap">長條為收入（SA1 合計），右側標示該產品毛利率。</p>
+    <div id="c3" role="img" aria-labelledby="c3t c3d"><span id="c3d" class="sr"></span><div id="c3b"></div></div>
+  </div>
+  <div class="card panel">
+    <h3 id="c4t">年度收入與毛利率（全期）</h3>
+    <p class="cap">此圖固定使用全部資料，不受上方篩選影響，用於年度比較。</p>
+    <div id="c4" role="img" aria-labelledby="c4t c4d"><span id="c4d" class="sr"></span><div id="c4b"></div></div>
+  </div>
+</section>
+
+<section class="grid2b">
+  <div class="card panel">
+    <h3>產品分類分析</h3>
+    <p class="cap">依篩選後資料彙總，依收入由高至低排列。</p>
+    <div class="tablewrap"><table id="tProd"><thead><tr><th>產品</th><th class="n">收入</th><th class="n">數量</th><th class="n">發票數</th><th class="n">毛利率</th><th class="n">收入佔比</th></tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="card panel">
+    <h3>目的地分類分析</h3>
+    <p class="cap">依篩選後資料彙總，依收入由高至低排列。</p>
+    <div class="tablewrap"><table id="tDest"><thead><tr><th>目的地</th><th class="n">收入</th><th class="n">數量</th><th class="n">發票數</th><th class="n">毛利率</th><th class="n">收入佔比</th></tr></thead><tbody></tbody></table></div>
+  </div>
+</section>
+
+<section class="grid2">
+  <div class="card risk">
+    <h2>風險與異常</h2>
+    <p class="hint">以下僅陳述來源資料可觀察到的事實。</p>
+    <ul id="riskList"></ul>
+  </div>
+  <div class="card ins">
+    <h2>洞察與建議行動</h2>
+    <p class="hint">洞察為資料觀察；建議行動按觀察提出，未包含來源以外資訊。</p>
+    <ul id="insList"></ul>
+    <div class="rec">
+      <h4>建議行動</h4>
+      <ol id="recList"></ol>
+    </div>
+  </div>
+</section>
+
+<section class="card panel">
+  <h2>發票明細</h2>
+  <p class="cap">可搜尋及排序；收入＝SA1（UnitPrice × Qty），成本＝UnitCost × Qty，毛利＝收入 − 成本。</p>
+  <div class="tablewrap">
+    <table id="tMain">
+      <thead><tr>
+        <th data-key="inv">發票號<span class="ar"></span></th>
+        <th data-key="date">日期<span class="ar"></span></th>
+        <th data-key="product">產品<span class="ar"></span></th>
+        <th data-key="dest">目的地<span class="ar"></span></th>
+        <th data-key="up" class="n">單價<span class="ar"></span></th>
+        <th data-key="uc" class="n">單位成本<span class="ar"></span></th>
+        <th data-key="qty" class="n">數量<span class="ar"></span></th>
+        <th data-key="revenue" class="n">收入（SA1）<span class="ar"></span></th>
+        <th data-key="profit" class="n">毛利<span class="ar"></span></th>
+        <th data-key="margin" class="n">毛利率<span class="ar"></span></th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <p class="scroll-hint" id="tableCount"></p>
+</section>
+
+<footer class="notes">
+  <p><b>資料處理說明：</b>來源僅含 SalesData 與隱藏工作表「PivotTable Answers」；後者只含練習指示並引用不存在的工作表（OrdersTable／SampleData），依要求已排除。已移除客戶姓名欄（CUS）以免顯示非必要個人資料；未包含任何註解或中繼資料。</p>
+  <p><b>沿用欄位與公式：</b>Date2 為 Date1 的參照；SA1 ＝ UnitPrice × Qty；SA2 ＝ SA1。儀表板沿用上述定義計算收入、成本與毛利。</p>
+  <p><b>限制：</b>來源未提供幣別、產品名稱、區域定義或客戶分類，儀表板不作推測；「報告期」取自 Date1 的最小值與最大值。</p>
+</footer>
+
+</main>
+</div>
+<div class="tip" id="tip" role="tooltip" aria-hidden="true"></div>
+
+<script>
+(function(){
+"use strict";
+var RAW = [["INV001","2019-06-27","PTS-11","AU",17000.0,14000.0,8],["INV002","2018-06-25","PTS-14","US",28000.0,18000.0,7],["INV003","2020-07-28","PTS-14","UK",25000.0,18000.0,12],["INV004","2020-04-30","PTS-14","US",32000.0,18000.0,9],["INV005","2020-08-05","PTS-15","HK",9000.0,7000.0,5],["INV006","2018-09-16","PTS-13","AU",23000.0,13000.0,6],["INV007","2018-06-01","PTS-14","AU",20000.0,18000.0,10],["INV008","2020-11-25","PTS-11","HK",7000.0,4000.0,8],["INV009","2020-11-05","PTS-10","US",23000.0,14000.0,7],["INV010","2019-09-27","PTS-13","AU",22000.0,13000.0,8],["INV011","2020-02-04","PTS-12","AU",4000.0,3000.0,8],["INV012","2018-08-17","PTS-14","UK",22000.0,18000.0,5],["INV013","2019-01-27","PTS-11","US",4000.0,4000.0,5],["INV014","2018-08-16","PTS-12","US",6000.0,3000.0,5],["INV015","2018-04-17","PTS-12","JP",5000.0,3000.0,8],["INV016","2020-09-03","PTS-11","US",7000.0,4000.0,5],["INV017","2019-05-10","PTS-12","UK",4000.0,3000.0,7],["INV018","2018-01-13","PTS-10","AU",18000.0,14000.0,7],["INV019","2019-10-24","PTS-15","AU",11000.0,7000.0,9],["INV020","2019-12-04","PTS-13","AU",23000.0,13000.0,6],["INV021","2018-05-10","PTS-10","US",22000.0,14000.0,9],["INV022","2020-06-03","PTS-13","JP",25000.0,13000.0,6],["INV023","2019-12-16","PTS-13","UK",21000.0,13000.0,5],["INV024","2020-07-16","PTS-14","US",19000.0,18000.0,5],["INV025","2019-06-25","PTS-15","US",11000.0,7000.0,6],["INV026","2018-01-27","PTS-12","UK",5000.0,3000.0,6],["INV027","2019-01-20","PTS-12","US",5000.0,3000.0,5],["INV028","2019-07-26","PTS-12","AU",5000.0,3000.0,7],["INV029","2019-08-16","PTS-15","JP",9000.0,7000.0,6],["INV030","2020-04-17","PTS-12","US",5000.0,3000.0,7],["INV031","2018-10-12","PTS-15","AU",9000.0,7000.0,7],["INV032","2020-10-17","PTS-12","AU",6000.0,3000.0,8],["INV033","2018-11-30","PTS-13","UK",16000.0,13000.0,6],["INV034","2019-06-26","PTS-15","AU",9000.0,7000.0,10],["INV035","2019-07-09","PTS-10","US",16000.0,14000.0,5],["INV036","2020-01-26","PTS-13","US",23000.0,13000.0,10],["INV037","2020-05-30","PTS-12","US",3000.0,3000.0,7],["INV038","2019-10-27","PTS-14","AU",21000.0,18000.0,7],["INV039","2018-10-25","PTS-10","AU",21000.0,14000.0,5],["INV040","2019-10-17","PTS-11","US",8000.0,4000.0,6],["INV041","2018-10-28","PTS-15","HK",8000.0,7000.0,6],["INV042","2018-02-02","PTS-11","JP",4000.0,4000.0,9],["INV043","2018-12-16","PTS-11","UK",5000.0,4000.0,6],["INV044","2018-07-30","PTS-13","AU",18000.0,13000.0,6],["INV045","2019-02-12","PTS-15","AU",11000.0,7000.0,5],["INV046","2019-06-23","PTS-12","UK",6000.0,6000.0,6],["INV047","2019-07-05","PTS-14","AU",35000.0,18000.0,5],["INV048","2020-03-23","PTS-13","US",13000.0,13000.0,9],["INV049","2018-11-09","PTS-14","AU",33000.0,18000.0,10],["INV050","2019-11-03","PTS-11","AU",8000.0,4000.0,6],["INV051","2018-05-21","PTS-11","HK",5000.0,4000.0,10],["INV052","2020-12-27","PTS-11","HK",4000.0,4000.0,8],["INV053","2019-03-15","PTS-15","JP",10000.0,7000.0,6],["INV054","2019-12-17","PTS-10","AU",20000.0,14000.0,5],["INV055","2020-03-14","PTS-11","US",7000.0,4000.0,10],["INV056","2020-10-30","PTS-12","US",3000.0,3000.0,5],["INV057","2020-08-24","PTS-11","US",5000.0,4000.0,5],["INV058","2018-06-03","PTS-15","AU",13000.0,7000.0,9],["INV059","2018-02-28","PTS-12","UK",3000.0,3000.0,10],["INV060","2018-12-29","PTS-15","US",11000.0,7000.0,7],["INV061","2018-06-10","PTS-11","US",6000.0,4000.0,8],["INV062","2018-10-13","PTS-11","JP",6000.0,4000.0,8],["INV063","2018-03-03","PTS-13","AU",16000.0,13000.0,6],["INV064","2019-05-13","PTS-10","AU",20000.0,14000.0,10],["INV065","2018-04-12","PTS-13","US",25000.0,13000.0,9],["INV066","2019-01-21","PTS-10","AU",15000.0,14000.0,5],["INV067","2019-05-30","PTS-15","AU",8000.0,7000.0,6],["INV068","2018-11-26","PTS-14","AU",19000.0,18000.0,6],["INV069","2020-05-12","PTS-13","US",15000.0,13000.0,8],["INV070","2019-11-06","PTS-10","AU",23000.0,14000.0,5],["INV071","2020-11-25","PTS-12","AU",5000.0,3000.0,9],["INV072","2018-12-22","PTS-11","AU",6000.0,4000.0,6],["INV073","2019-09-28","PTS-14","US",22000.0,18000.0,5],["INV074","2019-03-25","PTS-15","AU",12000.0,7000.0,9],["INV075","2019-12-01","PTS-14","AU",36000.0,18000.0,6],["INV076","2018-01-18","PTS-11","AU",5000.0,4000.0,7],["INV077","2018-11-19","PTS-11","UK",6000.0,4000.0,7],["INV078","2018-06-14","PTS-14","US",19000.0,18000.0,6],["INV079","2018-05-06","PTS-11","US",7000.0,4000.0,5],["INV080","2019-09-14","PTS-14","AU",29000.0,18000.0,7],["INV081","2020-08-30","PTS-13","JP",18000.0,13000.0,5],["INV082","2018-09-02","PTS-12","AU",5000.0,3000.0,9],["INV083","2019-02-12","PTS-11","AU",5000.0,4000.0,6],["INV084","2020-06-22","PTS-12","HK",5000.0,3000.0,9],["INV085","2019-03-10","PTS-12","AU",6000.0,3000.0,5],["INV086","2018-08-31","PTS-10","AU",27000.0,14000.0,10],["INV087","2019-04-01","PTS-14","AU",28000.0,18000.0,9],["INV088","2019-03-17","PTS-12","AU",4000.0,3000.0,9],["INV089","2019-10-11","PTS-12","AU",3000.0,3000.0,5],["INV090","2019-06-01","PTS-12","UK",5000.0,3000.0,9],["INV091","2018-01-11","PTS-10","HK",15000.0,14000.0,5],["INV092","2020-07-20","PTS-13","HK",23000.0,13000.0,9],["INV093","2018-09-19","PTS-10","AU",17000.0,14000.0,8],["INV094","2020-01-04","PTS-13","AU",22000.0,13000.0,9],["INV095","2018-06-19","PTS-10","US",23000.0,14000.0,8],["INV096","2018-10-22","PTS-11","US",7000.0,4000.0,8],["INV097","2019-11-18","PTS-13","US",24000.0,13000.0,9],["INV098","2018-05-05","PTS-10","JP",19000.0,14000.0,5],["INV099","2018-10-28","PTS-13","AU",22000.0,13000.0,9]];
+var rows = RAW.map(function(a){
+  var revenue = a[4]*a[6], cost = a[5]*a[6], profit = revenue-cost;
+  return {inv:a[0], date:a[1], product:a[2], dest:a[3], up:a[4], uc:a[5], qty:a[6],
+          revenue:revenue, cost:cost, profit:profit,
+          margin: revenue ? profit/revenue*100 : null,
+          year:a[1].slice(0,4), month:a[1].slice(0,7)};
+});
+var state = {year:"all", dest:"all", product:"all", q:"", sortKey:"date", sortDir:-1};
+var $ = function(s,r){ return (r||document).querySelector(s); };
+var $$ = function(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+
+function nf(n){ return (n==null||isNaN(n)) ? "—" : Number(n).toLocaleString("zh-Hant",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function nf0(n){ return (n==null||isNaN(n)) ? "—" : Number(n).toLocaleString("zh-Hant",{maximumFractionDigits:0}); }
+function pc(n){ return (n==null||isNaN(n)) ? "—" : Number(n).toFixed(2)+"%"; }
+
+function current(){
+  return rows.filter(function(r){
+    if(state.year!=="all" && r.year!==state.year) return false;
+    if(state.dest!=="all" && r.dest!==state.dest) return false;
+    if(state.product!=="all" && r.product!==state.product) return false;
+    return true;
+  });
+}
+function total(list,key){ return list.reduce(function(s,r){ return s+r[key]; },0); }
+
+/* ---------- KPI ---------- */
+function renderKPI(list){
+  var rev=total(list,"revenue"), cost=total(list,"cost"), profit=total(list,"profit"), qty=total(list,"qty");
+  var invs={}, i; for(i=0;i<list.length;i++) invs[list[i].inv]=1;
+  var nInv=Object.keys(invs).length;
+  var kp=[
+    ["總收入", nf(rev), "SA1 合計"],
+    ["總成本", nf(cost), "UnitCost × Qty 合計"],
+    ["毛利", nf(profit), "收入 − 成本"],
+    ["毛利率", pc(rev?profit/rev*100:null), "毛利 ÷ 收入"],
+    ["發票數", nf0(nInv), "不重複發票號"],
+    ["總銷售數量", nf0(qty), "Qty 合計"],
+    ["平均訂單金額", nf(nInv?rev/nInv:null), "收入 ÷ 發票數"],
+    ["平均單價", nf(qty?rev/qty:null), "收入 ÷ 總數量"]
+  ];
+  $("#kpis").innerHTML = kp.map(function(k){
+    return '<div class="kpi"><div class="k">'+k[0]+'</div><div class="v">'+k[1]+'</div><div class="s">'+k[2]+'</div></div>';
+  }).join("");
+  $("#badgeRows").textContent = nf0(nInv);
+}
+
+/* ---------- tooltip ---------- */
+var tip=$("#tip");
+function showTip(el,html){
+  tip.innerHTML=html; tip.classList.add("show"); tip.setAttribute("aria-hidden","false");
+  var r=el.getBoundingClientRect();
+  var x=Math.min(window.innerWidth-270,Math.max(8,r.left+r.width/2-120));
+  var y=r.top-10;
+  tip.style.left=x+"px"; tip.style.top=Math.max(8,y-tip.offsetHeight)+"px";
+}
+function hideTip(){ tip.classList.remove("show"); tip.setAttribute("aria-hidden","true"); }
+document.addEventListener("mouseover",function(e){ var t=e.target.closest("[data-tip]"); if(t) showTip(t,t.getAttribute("data-tip")); });
+document.addEventListener("mouseout",function(e){ if(e.target.closest("[data-tip]")) hideTip(); });
+document.addEventListener("focusin",function(e){ var t=e.target.closest("[data-tip]"); if(t) showTip(t,t.getAttribute("data-tip")); });
+document.addEventListener("focusout",function(e){ if(e.target.closest("[data-tip]")) hideTip(); });
+window.addEventListener("scroll",hideTip,{passive:true});
+
+/* ---------- helpers ---------- */
+function monthList(){
+  var out=[], y=2018, m=1;
+  while(y<2021 || (y===2021&&m<1)){
+    out.push(y+"-"+String(m).padStart(2,"0"));
+    m++; if(m>12){m=1;y++;}
+    if(y>2020) break;
+  }
+  return out;
+}
+var MONTHS = monthList();
+function niceMax(v){
+  if(v<=0) return 1;
+  var p=Math.pow(10,Math.floor(Math.log10(v))), n=v/p;
+  var step = n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10;
+  return step*p;
+}
+
+/* ---------- chart 1: monthly line ---------- */
+function renderMonthly(list){
+  var agg={}; MONTHS.forEach(function(m){ agg[m]={rev:0,inv:0,qty:0}; });
+  list.forEach(function(r){ if(agg[r.month]){agg[r.month].rev+=r.revenue;agg[r.month].inv+=1;agg[r.month].qty+=r.qty;} });
+  var vals=MONTHS.map(function(m){return agg[m].rev;});
+  var max=niceMax(Math.max.apply(null,vals.concat([1])));
+  var W=740,H=250,ml=62,mr=14,mt=14,mb=34, iw=W-ml-mr, ih=H-mt-mb;
+  var x=function(i){ return ml + (MONTHS.length>1 ? i*(iw/(MONTHS.length-1)) : iw/2); };
+  var y=function(v){ return mt+ih-(v/max)*ih; };
+  var pts=vals.map(function(v,i){ return [x(i),y(v)]; });
+  var line=pts.map(function(p,i){ return (i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1); }).join(" ");
+  var area=line+" L"+x(MONTHS.length-1).toFixed(1)+" "+(mt+ih)+" L"+x(0).toFixed(1)+" "+(mt+ih)+" Z";
+  var g="";
+  [0,.25,.5,.75,1].forEach(function(t){
+    var yy=mt+ih-t*ih;
+    g+='<line x1="'+ml+'" y1="'+yy.toFixed(1)+'" x2="'+(W-mr)+'" y2="'+yy.toFixed(1)+'" stroke="currentColor" stroke-opacity=".12" stroke-width="1"/>';
+    g+='<text x="'+(ml-8)+'" y="'+(yy+4).toFixed(1)+'" text-anchor="end" font-size="10" fill="currentColor" opacity=".55">'+nf0(max*t)+'</text>';
+  });
+  var labels="";
+  MONTHS.forEach(function(m,i){
+    if(i%6===0){ labels+='<text x="'+x(i).toFixed(1)+'" y="'+(H-10)+'" text-anchor="middle" font-size="10" fill="currentColor" opacity=".55">'+m.slice(2)+'</text>'; }
+  });
+  var dots=pts.map(function(p,i){
+    var m=MONTHS[i],a=agg[m];
+    var lb='<div><b>'+m+'</b><br>收入 '+nf(a.rev)+'<br>發票 '+a.inv+' 張 · 數量 '+a.qty+'</div>';
+    return '<circle class="pt" tabindex="0" cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3.2" fill="var(--accent)" stroke="var(--card)" stroke-width="1.5" data-tip="'+esc(lb)+'" role="img" aria-label="'+esc(m+' 收入 '+nf(a.rev)+'，發票 '+a.inv+' 張')+'"/>';
+  }).join("");
+  $("#c1b").innerHTML='<svg class="chart" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet" aria-hidden="true">'
+    +'<defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--accent)" stop-opacity=".28"/><stop offset="1" stop-color="var(--accent)" stop-opacity=".02"/></linearGradient></defs>'
+    +g+'<path d="'+area+'" fill="url(#ga)"/><path d="'+line+'" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>'+dots+labels+'</svg>'
+    +'<div class="legend"><span><i style="background:var(--accent)"></i>每月收入</span></div>';
+  var tot=total(list,"revenue");
+  $("#c1d").textContent="月度收入折線圖，共 "+MONTHS.length+" 個月，總收入 "+nf(tot)+"，最高月收入 "+nf(Math.max.apply(null,vals))+"。";
+}
+
+/* ---------- chart 2: donut ---------- */
+var DONUT_COLORS=["#0F766E","#0369A1","#7C3AED","#B45309","#BE123C","#4D7C0F"];
+function renderDonut(list){
+  var agg={}, order=[];
+  list.forEach(function(r){ if(!agg[r.dest]){agg[r.dest]={rev:0,inv:0,qty:0};order.push(r.dest);} agg[r.dest].rev+=r.revenue;agg[r.dest].inv+=1;agg[r.dest].qty+=r.qty; });
+  order.sort(function(a,b){return agg[b].rev-agg[a].rev;});
+  var tot=order.reduce(function(s,k){return s+agg[k].rev;},0);
+  var W=360,H=250,cx=170,cy=125,R=88,sw=26,circ=2*Math.PI*R;
+  var off=0, segs="", leg="";
+  order.forEach(function(k,i){
+    var frac=tot?agg[k].rev/tot:0, len=frac*circ;
+    var col=DONUT_COLORS[i%DONUT_COLORS.length];
+    segs+='<circle class="pt" tabindex="0" cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="'+col+'" stroke-width="'+sw+'" stroke-dasharray="'+len.toFixed(2)+' '+(circ-len).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 '+cx+' '+cy+')" data-tip="'+esc('<b>'+k+'</b><br>收入 '+nf(agg[k].rev)+'<br>佔比 '+(frac*100).toFixed(2)+'%<br>發票 '+agg[k].inv+' 張 · 數量 '+agg[k].qty)+'" role="img" aria-label="'+esc(k+' 收入 '+nf(agg[k].rev)+'，佔比 '+(frac*100).toFixed(2)+'%')+'"/>';
+    leg+='<span><i style="background:'+col+'"></i>'+k+' '+(frac*100).toFixed(2)+'%</span>';
+    off+=len;
+  });
+  $("#c2b").innerHTML='<svg class="chart" viewBox="0 0 '+W+' '+H+'" style="max-height:250px" aria-hidden="true">'+segs
+    +'<text x="'+cx+'" y="'+(cy-4)+'" text-anchor="middle" font-size="10" fill="currentColor" opacity=".6">總收入</text>'
+    +'<text x="'+cx+'" y="'+(cy+16)+'" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">'+nf0(tot)+'</text></svg>'
+    +'<div class="legend">'+leg+'</div>';
+  $("#c2d").textContent="目的地收入環形圖："+order.map(function(k){return k+" "+(tot?(agg[k].rev/tot*100).toFixed(2):"0")+"%";}).join("，")+"。";
+}
+
+/* ---------- chart 3: product bars ---------- */
+function renderProductBars(list){
+  var agg={}, order=[];
+  list.forEach(function(r){ if(!agg[r.product]){agg[r.product]={rev:0,profit:0,qty:0,inv:0};order.push(r.product);} var o=agg[r.product];o.rev+=r.revenue;o.profit+=r.profit;o.qty+=r.qty;o.inv+=1;});
+  order.sort(function(a,b){return agg[b].rev-agg[a].rev;});
+  var max=niceMax(Math.max.apply(null,order.map(function(k){return agg[k].rev;}).concat([1])));
+  var W=740, rowH=34, top=24, left=88, right=150, H=top+Math.max(order.length,1)*rowH+12;
+  var iw=W-left-right;
+  var g="";
+  order.forEach(function(k,i){
+    var o=agg[k], y=top+i*rowH, w=iw*(o.rev/max), m=o.rev?o.profit/o.rev*100:null;
+    g+='<text x="'+(left-10)+'" y="'+(y+15)+'" text-anchor="end" font-size="11.5" fill="currentColor">'+esc(k)+'</text>';
+    g+='<rect class="bar" tabindex="0" x="'+left+'" y="'+y+'" width="'+Math.max(w,1).toFixed(1)+'" height="20" rx="4" fill="var(--accent2)" opacity=".9" data-tip="'+esc('<b>'+k+'</b><br>收入 '+nf(o.rev)+'<br>毛利 '+nf(o.profit)+' · 毛利率 '+(m==null?"—":m.toFixed(2)+"%")+'<br>發票 '+o.inv+' 張 · 數量 '+o.qty)+'" role="img" aria-label="'+esc(k+' 收入 '+nf(o.rev)+'，毛利率 '+(m==null?"無資料":m.toFixed(2)+"%"))+'"/>';
+    g+='<text x="'+(left+Math.max(w,1)+8)+'" y="'+(y+14)+'" font-size="10.5" fill="currentColor" opacity=".75">'+nf0(o.rev)+'　'+(m==null?"—":m.toFixed(2)+"%")+'</text>';
+  });
+  $("#c3b").innerHTML='<svg class="chart" viewBox="0 0 '+W+' '+H+'" aria-hidden="true">'+g+'</svg>'
+    +'<div class="legend"><span><i style="background:var(--accent2)"></i>收入（右側數字為收入與毛利率）</span></div>';
+  $("#c3d").textContent="產品收入長條圖，共 "+order.length+" 款產品："+order.map(function(k){return k+" "+nf(agg[k].rev);}).join("，")+"。";
+}
+
+/* ---------- chart 4: year combo (all data) ---------- */
+function renderYearChart(){
+  var years=["2018","2019","2020"], agg={};
+  years.forEach(function(y){ agg[y]={rev:0,profit:0,inv:0,qty:0}; });
+  rows.forEach(function(r){ if(agg[r.year]){agg[r.year].rev+=r.revenue;agg[r.year].profit+=r.profit;agg[r.year].inv+=1;agg[r.year].qty+=r.qty;} });
+  var max=niceMax(Math.max.apply(null,years.map(function(y){return agg[y].rev;}).concat([1])));
+  var W=740,H=250,ml=62,mr=54,mt=18,mb=36,iw=W-ml-mr,ih=H-mt-mb;
+  var bw=iw/years.length*0.46;
+  var y=function(v){return mt+ih-(v/max)*ih;};
+  var y2=function(p){return mt+ih-(p/40)*ih;};
+  var g="";
+  [0,.25,.5,.75,1].forEach(function(t){
+    var yy=mt+ih-t*ih;
+    g+='<line x1="'+ml+'" y1="'+yy.toFixed(1)+'" x2="'+(W-mr)+'" y2="'+yy.toFixed(1)+'" stroke="currentColor" stroke-opacity=".12"/>';
+    g+='<text x="'+(ml-8)+'" y="'+(yy+4).toFixed(1)+'" text-anchor="end" font-size="10" fill="currentColor" opacity=".55">'+nf0(max*t)+'</text>';
+    g+='<text x="'+(W-mr+8)+'" y="'+(yy+4).toFixed(1)+'" font-size="10" fill="currentColor" opacity=".55">'+(40*t).toFixed(0)+'%</text>';
+  });
+  var line=[];
+  years.forEach(function(k,i){
+    var cx=ml+iw/years.length*(i+0.5), a=agg[k];
+    var m=a.rev?a.profit/a.rev*100:null;
+    g+='<rect class="bar" tabindex="0" x="'+(cx-bw/2)+'" y="'+y(a.rev).toFixed(1)+'" width="'+bw+'" height="'+(mt+ih-y(a.rev)).toFixed(1)+'" rx="5" fill="var(--accent)" opacity=".85" data-tip="'+esc('<b>'+k+'</b><br>收入 '+nf(a.rev)+'<br>毛利 '+nf(a.profit)+' · 毛利率 '+(m==null?"—":m.toFixed(2)+"%")+'<br>發票 '+a.inv+' 張 · 數量 '+a.qty)+'" role="img" aria-label="'+esc(k+' 收入 '+nf(a.rev)+'，毛利率 '+(m==null?"無資料":m.toFixed(2)+"%"))+'"/>';
+    g+='<text x="'+cx+'" y="'+(H-12)+'" text-anchor="middle" font-size="11" fill="currentColor">'+k+'</text>';
+    if(m!=null) line.push([cx,y2(m)]);
+  });
+  var lp=line.map(function(p,i){return (i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1);}).join(" ");
+  var dots=line.map(function(p,i){return '<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3.4" fill="var(--warn)"/>';}).join("");
+  $("#c4b").innerHTML='<svg class="chart" viewBox="0 0 '+W+' '+H+'" aria-hidden="true">'+g
+    +'<path d="'+lp+'" fill="none" stroke="var(--warn)" stroke-width="2" stroke-dasharray="4 3"/>'+dots+'</svg>'
+    +'<div class="legend"><span><i style="background:var(--accent)"></i>年收入（左軸）</span><span><i style="background:var(--warn)"></i>毛利率（右軸，0–40%）</span></div>';
+  $("#c4d").textContent="年度收入與毛利率："+years.map(function(k){var a=agg[k];return k+" 收入 "+nf(a.rev)+"，毛利率 "+(a.rev?(a.profit/a.rev*100).toFixed(2):"—")+"%";}).join("；")+"。";
+}
+
+/* ---------- tables ---------- */
+function aggBy(list,key){
+  var m={},order=[];
+  list.forEach(function(r){ if(!m[r[key]]){m[r[key]]={rev:0,profit:0,qty:0,inv:0};order.push(r[key]);} var o=m[r[key]];o.rev+=r.revenue;o.profit+=r.profit;o.qty+=r.qty;o.inv+=1;});
+  order.sort(function(a,b){return m[b].rev-m[a].rev;});
+  return {m:m,order:order};
+}
+function renderCatTables(list){
+  var tot=total(list,"revenue");
+  [["tProd","product"],["tDest","dest"]].forEach(function(pair){
+    var a=aggBy(list,pair[1]);
+    var html=a.order.map(function(k){
+      var o=a.m[k], mg=o.rev?o.profit/o.rev*100:null;
+      return '<tr><td>'+esc(k)+'</td><td class="n">'+nf(o.rev)+'</td><td class="n">'+nf0(o.qty)+'</td><td class="n">'+o.inv+'</td><td class="n">'+pc(mg)+'</td><td class="n">'+(tot?(o.rev/tot*100).toFixed(2):"0.00")+'%</td></tr>';
+    }).join("") || '<tr><td colspan="6" class="empty">沒有符合篩選條件的資料。</td></tr>';
+    $("#"+pair[0]+" tbody").innerHTML=html;
+  });
+}
+
+function sortVal(r,k){ return k==="margin" ? (r.margin==null?-1e9:r.margin) : r[k]; }
+function renderTable(list){
+  var q=state.q.trim().toLowerCase();
+  var data=list.filter(function(r){
+    if(!q) return true;
+    return (r.inv+" "+r.date+" "+r.product+" "+r.dest).toLowerCase().indexOf(q)>-1;
+  });
+  data.sort(function(a,b){
+    var x=sortVal(a,state.sortKey), y=sortVal(b,state.sortKey);
+    if(typeof x==="string"){ return state.sortDir*x.localeCompare(y); }
+    return state.sortDir*(x-y);
+  });
+  var html=data.map(function(r){
+    return '<tr><td>'+esc(r.inv)+'</td><td>'+esc(r.date)+'</td><td>'+esc(r.product)+'</td><td>'+esc(r.dest)+'</td>'
+      +'<td class="n">'+nf(r.up)+'</td><td class="n">'+nf(r.uc)+'</td><td class="n">'+nf0(r.qty)+'</td>'
+      +'<td class="n">'+nf(r.revenue)+'</td><td class="n">'+nf(r.profit)+'</td><td class="n">'+pc(r.margin)+'</td></tr>';
+  }).join("") || '<tr><td colspan="10" class="empty">沒有符合搜尋或篩選條件的發票。</td></tr>';
+  $("#tMain tbody").innerHTML=html;
+  $("#tableCount").textContent="顯示 "+data.length+" 筆，共 "+list.length+" 筆（全部 99 筆）。";
+  $$("#tMain th[data-key]").forEach(function(th){
+    var k=th.getAttribute("data-key"), ar=th.querySelector(".ar");
+    th.setAttribute("aria-sort", k===state.sortKey ? (state.sortDir>0?"ascending":"descending") : "none");
+    if(ar) ar.textContent = k===state.sortKey ? (state.sortDir>0?"▲":"▼") : "";
+  });
+}
+
+/* ---------- risks / insights ---------- */
+function renderNarratives(list){
+  var rev=total(list,"revenue"), profit=total(list,"profit");
+  var zero=list.filter(function(r){return r.profit===0;});
+  var neg=list.filter(function(r){return r.profit<0;});
+  var zrev=total(zero,"revenue");
+  var invs={},i; for(i=0;i<list.length;i++) invs[list[i].inv]=1;
+  var dup=list.length-Object.keys(invs).length;
+  var risks=[
+    '<li><span class="pill w">零毛利</span>'+zero.length+' 張發票的單位售價等於單位成本，合計收入 '+nf(zrev)+'（佔篩選後收入 '+(rev?(zrev/rev*100).toFixed(2):"0.00")+'%）。發票號：'+(zero.length?zero.map(function(r){return esc(r.inv);}).join("、"):"無")+'。</li>',
+    '<li><span class="pill g">無負毛利</span>期內沒有毛利為負的發票（' + neg.length + ' 張）。</li>',
+    '<li><span class="pill g">無重複</span>發票號重複 ' + dup + ' 筆。</li>'
+  ];
+  var prices={};
+  list.forEach(function(r){ (prices[r.product]=prices[r.product]||[]).push(r.up); });
+  var spread=Object.keys(prices).map(function(k){var a=prices[k];return {k:k,min:Math.min.apply(null,a),max:Math.max.apply(null,a)};})
+    .sort(function(a,b){return (b.max-b.min)-(a.max-a.min);}).slice(0,2);
+  if(spread.length){
+    risks.push('<li><span class="pill w">價格差異</span>同一產品單價區間差異最大者：'+spread.map(function(s){return esc(s.k)+' '+nf(s.min)+'–'+nf(s.max);}).join('；')+'。可能反映折扣或定價不一致，需對照來源政策確認。</li>');
+  }
+  risks.push('<li><span class="pill d">資料限制</span>來源未標示幣別；已移除客戶姓名（CUS）；隱藏工作表已排除。相關結論不作推測。</li>');
+  $("#riskList").innerHTML=risks.join("");
+
+  var ins=[];
+  var y={};
+  rows.forEach(function(r){ if(!y[r.year]) y[r.year]={revenue:0,profit:0,invoices:0,qty:0}; var o=y[r.year]; o.revenue+=r.revenue; o.profit+=r.profit; o.invoices+=1; o.qty+=r.qty; });
+  if(state.year==="all" && state.dest==="all" && state.product==="all"){
+    ins.push('<li>收入由 2018 年 '+nf(y["2018"].revenue)+' 降至 2019 年 '+nf(y["2019"].revenue)+'（'+((y["2019"].revenue/y["2018"].revenue-1)*100).toFixed(2)+'%），再降至 2020 年 '+nf(y["2020"].revenue)+'（'+((y["2020"].revenue/y["2019"].revenue-1)*100).toFixed(2)+'%）。</li>');
+    ins.push('<li>發票數由 2018 年 '+y["2018"].invoices+' 張降至 2020 年 '+y["2020"].invoices+' 張，收入下降與發票數減少同步出現。</li>');
+  }
+  var d=aggBy(list,"dest");
+  if(d.order.length){
+    var top=d.order[0], share=rev?d.m[top].rev/rev*100:0;
+    ins.push('<li>目的地集中度：'+esc(top)+' 佔篩選後收入 '+share.toFixed(2)+'%（'+nf(d.m[top].rev)+'）。</li>');
+  }
+  var p=aggBy(list,"product");
+  if(p.order.length){
+    var tp=p.order[0];
+    ins.push('<li>收入最高產品：'+esc(tp)+'，收入 '+nf(p.m[tp].rev)+'（'+(rev?(p.m[tp].rev/rev*100).toFixed(2):"0.00")+'%）。</li>');
+    var marg=p.order.filter(function(k){return p.m[k].rev>0;}).map(function(k){return {k:k,m:p.m[k].profit/p.m[k].rev*100};}).sort(function(a,b){return b.m-a.m;});
+    if(marg.length){ ins.push('<li>毛利率最高產品：'+esc(marg[0].k)+'（'+marg[0].m.toFixed(2)+'%）；最低：'+esc(marg[marg.length-1].k)+'（'+marg[marg.length-1].m.toFixed(2)+'%）。</li>'); }
+  }
+  $("#insList").innerHTML=ins.join("");
+
+  var recs=[];
+  if(zero.length) recs.push('檢視 '+zero.length+' 張零毛利發票（合計收入 '+nf(zrev)+'）的定價與成本，確認是否屬促銷或資料輸入問題。');
+  recs.push('就收入與發票數連續兩年下降，檢視 2019–2020 年的銷售管道與客戶開發紀錄（來源未提供相關欄位，需另行補充）。');
+  if(d.order.length && rev && d.m[d.order[0]].rev/rev>0.4) recs.push('最大目的地 '+esc(d.order[0])+' 佔收入 '+(d.m[d.order[0]].rev/rev*100).toFixed(2)+'%，建議評估市場集中風險。');
+  if(d.order.length){ var low=d.order.map(function(k){return {k:k,m:d.m[k].rev?d.m[k].profit/d.m[k].rev*100:null};}).filter(function(x){return x.m!=null;}).sort(function(a,b){return a.m-b.m;})[0]; if(low) recs.push('毛利率最低目的地為 '+esc(low.k)+'（'+low.m.toFixed(2)+'%），建議核對該市場定價與成本結構。'); }
+  recs.push('同一產品單價區間差異較大，建議建立價格表與折扣審批，減少定價不一致。');
+  $("#recList").innerHTML=recs.map(function(x){return '<li>'+x+'</li>';}).join("");
+}
+
+/* ---------- orchestration ---------- */
+function esc(s){ return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+
+function renderAll(){
+  var list=current();
+  renderKPI(list);
+  renderMonthly(list);
+  renderDonut(list);
+  renderProductBars(list);
+  renderYearChart();
+  renderCatTables(list);
+  renderTable(list);
+  renderNarratives(list);
+  var s=$("#filterStatus");
+  s.textContent="已套用篩選："+ (state.year==="all"?"全部年份":state.year) + "、" + (state.dest==="all"?"全部目的地":state.dest) + "、" + (state.product==="all"?"全部產品":state.product) + "，共 " + list.length + " 筆。";
+}
+
+$("#fYear").addEventListener("change",function(e){state.year=e.target.value;renderAll();});
+$("#fDest").addEventListener("change",function(e){state.dest=e.target.value;renderAll();});
+$("#fProd").addEventListener("change",function(e){state.product=e.target.value;renderAll();});
+$("#fSearch").addEventListener("input",function(e){state.q=e.target.value;renderTable(current());});
+$("#resetBtn").addEventListener("click",function(){
+  state.year="all";state.dest="all";state.product="all";state.q="";
+  $("#fYear").value="all";$("#fDest").value="all";$("#fProd").value="all";$("#fSearch").value="";
+  state.sortKey="date";state.sortDir=-1;
+  renderAll();
+});
+$$("#tMain th[data-key]").forEach(function(th){
+  th.addEventListener("click",function(){
+    var k=th.getAttribute("data-key");
+    if(state.sortKey===k){ state.sortDir*=-1; } else { state.sortKey=k; state.sortDir= k==="inv"||k==="date"||k==="product"||k==="dest" ? 1 : -1; }
+    renderTable(current());
+  });
+});
+
+renderAll();
+})();
+</script>
+</body>
+</html>

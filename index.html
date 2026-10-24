@@ -494,6 +494,9 @@
     const v = String(text || "").trim();
     if(!v) return;
     todos.unshift({ id: uid(), text: v, done: false, createdAt: Date.now() });
+    // A new task is always active; if the "Done" filter is active it would be
+    // invisible, so fall back to "All" to show the task the user just added.
+    if(filter === "done") filter = "all";
     save(); render();
   }
 
